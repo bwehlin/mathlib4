@@ -1,12 +1,13 @@
-import Mathlib.Tactic
-import Mathlib.Util.Delaborators
+/-
+Copyright (c) 2025 Björn H. Wehlin. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Björn H. Wehlin
+-/
 
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Measure.Dirac
 
 import Mathlib.Algebra.Group.Indicator
-
-set_option warningAsError false
 
 noncomputable section
 
@@ -14,6 +15,8 @@ open MeasureTheory
 open MeasureTheory.Measure
 open Function
 open Set
+
+namespace Probability.PointProcess
 
 variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
 
@@ -132,3 +135,5 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
     · have : PointMeasure f {f i₁} ≠ 1 := by
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
+
+end Probability.PointProcess
