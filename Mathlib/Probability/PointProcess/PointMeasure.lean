@@ -16,12 +16,15 @@ open MeasureTheory.Measure
 open Function
 open Set
 
-namespace Probability.PointProcess
+namespace Probability.RandomMeasures
 
 variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
 
 noncomputable def PointMeasure {S : Set ℕ} (f : S → α) :
   Measure α := Measure.sum (fun i ↦ Measure.dirac (f i))
+
+def IsPointMeasure {E : Type*} [MeasurableSpace E] (μ : Measure E) : Prop :=
+  ∃ S : Set ℕ, ∃ f : S → E, μ = PointMeasure f
 
 def IsSimplePointMeasure {S : Set ℕ} (f : S → α)  : Prop :=
     ∀ x : α, PointMeasure f {x} = 0 ∨ PointMeasure f {x} = 1
@@ -136,4 +139,4 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
 
-end Probability.PointProcess
+end Probability.RandomMeasures
