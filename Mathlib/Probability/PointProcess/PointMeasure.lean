@@ -147,6 +147,9 @@ theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeas
       ∧ ∀ m n : ℤ, m < n → f m ≤ f n
       ∧ (∀ s : Set ℝ, Measurable s → μ s =
         ∑' n : ℤ, if ((f n) = ⊤ ∨ (f n) = ⊥) then 0 else dirac (EReal.toReal (f n)) s) := by
-    sorry
+  obtain ⟨t, ⟨f, μdef⟩⟩  := h
+
+
+  sorry
 
 end Probability.RandomMeasures
