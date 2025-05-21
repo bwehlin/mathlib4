@@ -6,6 +6,7 @@ Authors: Björn H. Wehlin
 
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Measure.Dirac
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 import Mathlib.Algebra.Group.Indicator
 
@@ -138,5 +139,14 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
     · have : PointMeasure f {f i₁} ≠ 1 := by
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
+
+theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeasure μ] :
+    ∃ f : ℤ → EReal,
+      f 0 ≤ 0
+      ∧ 0 < f 1
+      ∧ ∀ m n : ℤ, m < n → f m ≤ f n
+      ∧ (∀ s : Set ℝ, Measurable s → μ s =
+        ∑' n : ℤ, if ((f n) = ⊤ ∨ (f n) = ⊥) then 0 else dirac (EReal.toReal (f n)) s) := by
+    sorry
 
 end Probability.RandomMeasures
