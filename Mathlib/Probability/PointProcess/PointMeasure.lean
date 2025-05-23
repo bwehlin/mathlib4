@@ -10,6 +10,10 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 import Mathlib.Algebra.Group.Indicator
 
+/-!
+
+!-/
+
 noncomputable section
 
 open MeasureTheory
@@ -140,14 +144,40 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
 
-theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeasure μ] :
+theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeasure μ] (a : ℝ) :
     ∃ f : ℤ → EReal,
-      f 0 ≤ 0
-      ∧ 0 < f 1
+      f 0 ≤ a ∧ a < f 1
       ∧ ∀ m n : ℤ, m < n → f m ≤ f n
       ∧ (∀ s : Set ℝ, Measurable s → μ s =
         ∑' n : ℤ, if ((f n) = ⊤ ∨ (f n) = ⊥) then 0 else dirac (EReal.toReal (f n)) s) := by
-  obtain ⟨t, ⟨f, μdef⟩⟩  := h
+  obtain ⟨s, ⟨f, hf⟩⟩ := h
+  simp[PointMeasure] at hf
+
+  let tlt := { n ∈ s | f ⟨n, by sorry⟩ < a }
+  let tge := { n ∈ s | f ⟨n, by sorry⟩ ≥ a }
+
+  have : s = tlt ∪ tge := by
+    refine Set.ext ?_
+    intro x
+    constructor
+    by_cases hx: x < 0
+    intro xt
+    have : x ∈ tlt := by sorry
+    exact mem_union_left tge this
+    intro xt
+    push_neg at hx
+    have : x ∈ tge := by sorry
+    exact mem_union_right tlt this
+    intro h
+    by_cases hc : x ∈ tlt
+    exact mem_of_mem_inter_left hc
+    simp[hc] at h
+    exact mem_of_mem_inter_left h
+
+
+
+
+
 
 
   sorry
