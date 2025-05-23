@@ -25,11 +25,11 @@ namespace Probability.RandomMeasures
 
 variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
 
-noncomputable def PointMeasure {S : Set ℕ} (f : S → α) :
+noncomputable def PointMeasure {ι : Type*} (f : ι → α) :
   Measure α := Measure.sum (fun i ↦ Measure.dirac (f i))
 
 def IsPointMeasure {E : Type*} [MeasurableSpace E] (μ : Measure E) : Prop :=
-  ∃ S : Set ℕ, ∃ f : S → E, μ = PointMeasure f
+  ∃ (ι : Type) (_ : Countable ι) (f : ι → E), μ = PointMeasure f
 
 def IsSimplePointMeasure {S : Set ℕ} (f : S → α)  : Prop :=
     ∀ x : α, PointMeasure f {x} = 0 ∨ PointMeasure f {x} = 1
@@ -150,11 +150,11 @@ theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeas
       ∧ ∀ m n : ℤ, m < n → f m ≤ f n
       ∧ (∀ s : Set ℝ, Measurable s → μ s =
         ∑' n : ℤ, if ((f n) = ⊤ ∨ (f n) = ⊥) then 0 else dirac (EReal.toReal (f n)) s) := by
-  obtain ⟨s, ⟨f, hf⟩⟩ := h
+  obtain ⟨ι, _, f, hf⟩ := h
   simp[PointMeasure] at hf
 
-  let tlt := { n ∈ s | f ⟨n, by sorry⟩ < a }
-  let tge := { n ∈ s | f ⟨n, by sorry⟩ ≥ a }
+  let tlt := { i | f i < a }
+  let tge := { i | f i ≥ a }
 
   have : s = tlt ∪ tge := by
     refine Set.ext ?_
