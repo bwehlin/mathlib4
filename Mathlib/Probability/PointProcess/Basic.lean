@@ -31,20 +31,30 @@ namespace Probability.RandomMeasures
 --variable {Ω : Type*} [MeasurableSpace Ω]
 --variable {E : Type*} [MeasurableSpace E]
 
+variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
+
+variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
+
 set_option diagnostics true
 
-class RandomMeasure (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] where
+class RandomMeasure {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] where
   distribution : Ω → Measure E
-  measurable_space : MeasurableSpace (Measure E)
-  measurable_distribution : Measurable distribution
+  --measurable_space : MeasurableSpace (Measure E)
+  --measurable_distribution : Measurable distribution
 
-class PointProcess (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E]
+class PointProcess₂ {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] extends RandomMeasure where
+  is_point_measure_as : μ {ω : Ω | IsPointMeasure (distribution ω)} = 1
+
+class PointProcess {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
     (μ : Measure Ω) [IsProbabilityMeasure μ]
     extends RandomMeasure Ω E where
   is_point_measure_as : μ {ω : Ω | IsPointMeasure (distribution ω)} = 1
 
-def IsSimplePointProcess (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E]
+def IsSimplePointProcess {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
     (μ : Measure Ω) [IsProbabilityMeasure μ] (N : PointProcess Ω E μ) : Prop :=
   ∀ ω : Ω, IsPointMeasure (N.distribution ω)
+
+def IsStationary (N : Type*) [PointProcess N] : Prop :=
+  sorry
 
 end Probability.RandomMeasures
