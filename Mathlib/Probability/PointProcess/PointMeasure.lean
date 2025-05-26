@@ -84,13 +84,13 @@ theorem is_simple_if_injective {s : Set ℕ} {f : s → α} (hf: Injective f)
           exact hj
       contrapose! this
       rw[hi]
-      rwa [dirac_apply'_ne_zero_iff_eq_one _ (hm x), dirac_on_singleton_iff (hm x)] at this
+      rwa [dirac_apply_ne_zero_iff_eq_one, dirac_on_singleton_iff (hm x)] at this
 
   ·   left
       have : ∀ (i : s), dirac (f i) {x} = 0 := by
           intro i
           contrapose! hx
-          rw [dirac_apply'_ne_zero_iff_eq_one _ (hm x), dirac_on_singleton_iff (hm x)] at hx
+          rw [dirac_apply_ne_zero_iff_eq_one, dirac_on_singleton_iff (hm x)] at hx
           refine (mem_image f univ x).mpr ?_
           use i
           simp
@@ -155,28 +155,6 @@ theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeas
 
   let tlt := { i | f i < a }
   let tge := { i | f i ≥ a }
-
-  have : s = tlt ∪ tge := by
-    refine Set.ext ?_
-    intro x
-    constructor
-    by_cases hx: x < 0
-    intro xt
-    have : x ∈ tlt := by sorry
-    exact mem_union_left tge this
-    intro xt
-    push_neg at hx
-    have : x ∈ tge := by sorry
-    exact mem_union_right tlt this
-    intro h
-    by_cases hc : x ∈ tlt
-    exact mem_of_mem_inter_left hc
-    simp[hc] at h
-    exact mem_of_mem_inter_left h
-
-
-
-
 
 
 
