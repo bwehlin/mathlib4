@@ -31,14 +31,38 @@ namespace Probability.RandomMeasures
 --variable {Ω : Type*} [MeasurableSpace Ω]
 --variable {E : Type*} [MeasurableSpace E]
 
-@[class] structure PointProcess (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ] where
+variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
+variable {μ : Measure Ω} [IsProbabilityMeasure μ]
+
+def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
+
+def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
+
+instance MeasureSpace : (Measure E) where
+
+def IsStationary (N : Ω → Measure E) : Prop :=
+  𝔼[evaluation_map] = 0
+
+class PointProcess where
   rv : Ω → Measure E
   is_point_measure_as : μ {ω | IsPointMeasure (rv ω)} = 1
 
+def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
+
+def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
+
+def IsStationary (N : Ω → Measure E) (h : IsPointProcess N) : Prop :=
+  sorry
+
+
+class PointProcess₁ (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ] where
+  rv : Ω → Measure E
+  is_point_measure_as : μ {ω | IsPointMeasure (rv ω)} = 1
+
+def evaluation_map₁ (N : PointProcess Ω E μ) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N.rv
+
 def evaluation_map (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ]
   (N : PointProcess Ω E μ) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N.rv
-
-instance NormedAddCommGroup : EReal := sorry
 
 def intensity_measure (Ω E : Type*) [MeasureSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ]
   (N : PointProcess Ω E μ) (a : Set E) := 𝔼[evaluation_map Ω E μ N a]
