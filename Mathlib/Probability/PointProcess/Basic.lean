@@ -6,10 +6,12 @@ Authors: Björn H. Wehlin
 
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Measure.Dirac
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 import Mathlib.Algebra.Group.Indicator
 
 import Mathlib.Probability.PointProcess.PointMeasure
+
 
 import Mathlib.Probability.Notation
 
@@ -34,12 +36,19 @@ namespace Probability.RandomMeasures
 variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
 variable {μ : Measure Ω} [IsProbabilityMeasure μ]
 
-def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
+--def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
 
-def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
+--def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
 
-instance MeasureSpace : (Measure E) where
+instance : MeasurableSpace (Measure E) where
+  MeasurableSet' := { μ : ∀ s : E.measurableSet, μ s ∈ borel ENNReal }
+  measurableSet_empty := sorry
+  measurableSet_compl := sorry
+  measurableSet_iUnion := sorry
 
+
+
+/-
 def IsStationary (N : Ω → Measure E) : Prop :=
   𝔼[evaluation_map] = 0
 
@@ -96,5 +105,5 @@ def IsSimplePointProcess {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
 
 def IsStationary (N : Type*) [PointProcess N] : Prop :=
   sorry
-
+-/
 end Probability.RandomMeasures
