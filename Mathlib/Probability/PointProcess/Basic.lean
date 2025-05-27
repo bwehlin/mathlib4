@@ -14,6 +14,7 @@ import Mathlib.Probability.PointProcess.PointMeasure
 
 
 import Mathlib.Probability.Notation
+import Mathlib.Probability.Kernel.Defs
 
 /-!
 
@@ -28,6 +29,8 @@ open Set
 
 open scoped NNReal ENNReal MeasureTheory ProbabilityTheory
 
+open ProbabilityTheory
+
 namespace Probability.RandomMeasures
 
 --variable {Ω : Type*} [MeasurableSpace Ω]
@@ -36,17 +39,9 @@ namespace Probability.RandomMeasures
 variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
 variable {μ : Measure Ω} [IsProbabilityMeasure μ]
 
---def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
-
---def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
-
-instance : MeasurableSpace (Measure E) where
-  MeasurableSet' := { μ : ∀ s : E.measurableSet, μ s ∈ borel ENNReal }
-  measurableSet_empty := sorry
-  measurableSet_compl := sorry
-  measurableSet_iUnion := sorry
-
-
+-- Thanks to Rémy Degenne for help on this
+class IsPointProcess (κ : Kernel Ω E) (μ : Measure Ω) : Prop where
+  is_point_measure_as : ∀ᵐ ω ∂μ, IsPointMeasure (κ ω)
 
 /-
 def IsStationary (N : Ω → Measure E) : Prop :=
