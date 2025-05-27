@@ -36,12 +36,20 @@ namespace Probability.RandomMeasures
 --variable {Ω : Type*} [MeasurableSpace Ω]
 --variable {E : Type*} [MeasurableSpace E]
 
-variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
+variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E]
 variable {μ : Measure Ω} [IsProbabilityMeasure μ]
 
 -- Thanks to Rémy Degenne for help on this
 class IsPointProcess (κ : Kernel Ω E) (μ : Measure Ω) : Prop where
   is_point_measure_as : ∀ᵐ ω ∂μ, IsPointMeasure (κ ω)
+
+def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
+
+--theorem evaluation_map_is_measurable (κ : Kernel Ω E) (a : Set E) :
+
+def IsStationary {E : Type*} [MeasurableSpace E] [TopologicalSpace E] (h : LocallyFinite E) (κ : Kernel Ω E) : Prop :=
+  𝔼[evaluation_map] = 0
+
 
 /-
 def IsStationary (N : Ω → Measure E) : Prop :=
