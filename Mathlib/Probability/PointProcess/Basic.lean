@@ -46,10 +46,17 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
 
+def Distribution (κ : Kernel Ω E) (P : Measure Ω) : Measure (Measure E) := P.map κ
+
 -- MeasureTheory.Measure.IsMulLeftInvariant
 def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] [IsPointProcess κ P]
+  {G : Type*} [Group G] [MulAction G E]
     : Prop :=
-  Measure.IsMulLeftInvariant
+  ∀ g : G, (Distribution κ P) = (Distribution (P.map (κ.toFun) G.smul) P)
+
+
+variable (κ : Kernel Ω E)
+#check κ.toFun
 
 
 def IsGroupInvariant {E : Type*} [MeasurableSpace E] (μ : Measure E) {G : Type*} (g : G)
