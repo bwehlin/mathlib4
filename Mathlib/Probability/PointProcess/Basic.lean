@@ -7,6 +7,7 @@ Authors: Björn H. Wehlin
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+import Mathlib.MeasureTheory.Group.Defs
 
 import Mathlib.Algebra.Group.Indicator
 
@@ -37,13 +38,33 @@ namespace Probability.RandomMeasures
 --variable {E : Type*} [MeasurableSpace E]
 
 variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E]
-variable {μ : Measure Ω} [IsProbabilityMeasure μ]
+variable {P : Measure Ω} [IsProbabilityMeasure P]
 
 -- Thanks to Rémy Degenne for help on this
-class IsPointProcess (κ : Kernel Ω E) (μ : Measure Ω) : Prop where
-  is_point_measure_as : ∀ᵐ ω ∂μ, IsPointMeasure (κ ω)
+class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Prop where
+  is_point_measure_as : ∀ᵐ ω ∂P, IsPointMeasure (κ ω)
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
+
+-- MeasureTheory.Measure.IsMulLeftInvariant
+def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] [IsPointProcess κ P]
+    : Prop :=
+  Measure.IsMulLeftInvariant
+
+
+def IsGroupInvariant {E : Type*} [MeasurableSpace E] (μ : Measure E) {G : Type*} (g : G)
+    [Group G] [MulAction G (Set E)] : Prop :=
+  ∀ s : Set E, MeasurableSet s → μ s = μ (g • s)
+
+def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] {G : Type*} (g : G)
+    [Group G] [MulAction G (Set E)] : Prop :=
+
+
+def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] [IsPointProcess κ P]
+    : Prop :=
+  sorry
+
+--def local_evaluation_map (κ : Kernel Ω E) ()
 
 --theorem evaluation_map_is_measurable (κ : Kernel Ω E) (a : Set E) :
 
