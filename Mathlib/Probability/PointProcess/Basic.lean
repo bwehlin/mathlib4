@@ -50,6 +50,12 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
 
+theorem MeasureTheory.integral_domSMul{E : Type u_2} [NormedAddCommGroup E] [NormedSpace ℝ E] {G : Type*} {A : Type*} [Group G] [AddCommGroup A] [DistribMulAction G A] [MeasurableSpace A] [MeasurableConstSMul G A] {μ : Measure A} (g : Gᵈᵐᵃ) (f : A → E) :
+    ∫ (x : A), f x ∂g • μ = ∫ (x : A), f ((DomMulAct.mk.symm g)⁻¹ • x) ∂μ := by
+  #check (DomMulAct.mk.symm g)⁻¹
+  #check DomMulAct.mk.symm g
+  sorry
+
 instance {G : Type*} [Group G] [MulAction G E] : MulAction G (Measure E) where
   smul := fun g μ => μ.map (fun x => g • x)
   one_smul := by
@@ -73,9 +79,9 @@ instance {G : Type*} [Group G] [MulAction G E] : MulAction G (Measure E) where
 
 -- MeasureTheory.Measure.IsMulLeftInvariant
 def IsStationary (κ : Kernel Ω E) (P : Measure Ω) (f : E → E) [IsProbabilityMeasure P] [IsPointProcess κ P]
-  {G : Type*} [Group G] [MulAction G E]
+  {G : Type*} [Group G] [MulAction G (Measure E)] [MeasurableSpace G]
     : Prop :=
-  IsMulLeftInvariant (P.map κ)
+  SMulInvariantMeasure G (P.map κ)
   --∀ g : G, ∀ s : Set E, (P.map κ) s = (P.map κ ) s
 
 
