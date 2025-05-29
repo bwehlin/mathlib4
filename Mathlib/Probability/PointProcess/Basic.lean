@@ -37,8 +37,12 @@ namespace Probability.RandomMeasures
 --variable {Ω : Type*} [MeasurableSpace Ω]
 --variable {E : Type*} [MeasurableSpace E]
 
+
 variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E]
 variable {P : Measure Ω} [IsProbabilityMeasure P]
+
+def distribution (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Measure (Measure E) :=
+  P.map κ
 
 -- Thanks to Rémy Degenne for help on this
 class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Prop where
@@ -46,18 +50,42 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
 
-def Distribution (κ : Kernel Ω E) (P : Measure Ω) : Measure (Measure E) := P.map κ
+instance {G : Type*} [Group G] [MulAction G E] : MulAction G (Measure E) where
+  smul := fun g μ => μ.map (fun x => g • x)
+  one_smul := by
+    intro μ
+    simp only [HSMul.hSMul]
+
+
+
+    -- example: this is OK
+    have : ∀ x : E, (1 : G) • x = x := by
+      intro x
+      exact MulAction.one_smul x
+
+    -- example: don't know where to go from here
+    have : ∀ x : E, SMul.smul (1 : G) x = x := by
+      intro x
+
+
+
+  mul_smul := sorry
 
 -- MeasureTheory.Measure.IsMulLeftInvariant
-def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] [IsPointProcess κ P]
+def IsStationary (κ : Kernel Ω E) (P : Measure Ω) (f : E → E) [IsProbabilityMeasure P] [IsPointProcess κ P]
   {G : Type*} [Group G] [MulAction G E]
     : Prop :=
-  ∀ g : G, (Distribution κ P) = (Distribution (P.map (κ.toFun) G.smul) P)
+  IsMulLeftInvariant (P.map κ)
+  --∀ g : G, ∀ s : Set E, (P.map κ) s = (P.map κ ) s
 
 
 variable (κ : Kernel Ω E)
 #check κ.toFun
-
+#check ⇑κ
+#check ↑κ
+#check P.map (κ.toFun)
+#check P.map κ
+#check P.map ⇑κ
 
 def IsGroupInvariant {E : Type*} [MeasurableSpace E] (μ : Measure E) {G : Type*} (g : G)
     [Group G] [MulAction G (Set E)] : Prop :=
