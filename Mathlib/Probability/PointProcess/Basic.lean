@@ -38,7 +38,7 @@ namespace Probability.RandomMeasures
 --variable {E : Type*} [MeasurableSpace E]
 
 
-variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E]
+variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E] [AddCommGroup E]
 variable {P : Measure Ω} [IsProbabilityMeasure P]
 
 def distribution (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Measure (Measure E) :=
@@ -49,6 +49,20 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
   is_point_measure_as : ∀ᵐ ω ∂P, IsPointMeasure (κ ω)
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
+
+def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] {G : Type*} (g : G)
+    [Group G] [MulAction G E] [MeasurableConstSMul G E] : Prop :=
+  ∀ g : G, P.map κ = P.map ((DomMulAct.mk.symm g)⁻¹ ⇑κ )
+
+variable {G : Type*} [Group G] [DistribMulAction G E] [MeasurableConstSMul G E]
+variable {μ : Measure E}
+--variable {g : Gᵈᵐᵃ}
+variable {κ : Kernel Ω E}
+
+theorem asdf : ∀ g : G, (DomMulAct.mk g) • μ = μ := sorry
+theorem ghjk : ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ := sorry
+
+#check g • μ
 
 theorem MeasureTheory.integral_domSMul{E : Type u_2} [NormedAddCommGroup E] [NormedSpace ℝ E] {G : Type*} {A : Type*} [Group G] [AddCommGroup A] [DistribMulAction G A] [MeasurableSpace A] [MeasurableConstSMul G A] {μ : Measure A} (g : Gᵈᵐᵃ) (f : A → E) :
     ∫ (x : A), f x ∂g • μ = ∫ (x : A), f ((DomMulAct.mk.symm g)⁻¹ • x) ∂μ := by
