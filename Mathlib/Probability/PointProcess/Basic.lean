@@ -16,6 +16,7 @@ import Mathlib.Probability.PointProcess.PointMeasure
 
 import Mathlib.Probability.Notation
 import Mathlib.Probability.Kernel.Defs
+import Mathlib.Probability.Distributions.Uniform
 
 /-!
 
@@ -34,12 +35,9 @@ open ProbabilityTheory
 
 namespace Probability.RandomMeasures
 
---variable {Ω : Type*} [MeasurableSpace Ω]
---variable {E : Type*} [MeasurableSpace E]
-
-
-variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E] [AddCommGroup E]
+variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpace E]
 variable {P : Measure Ω} [IsProbabilityMeasure P]
+variable {κ : Kernel Ω E}
 
 def distribution (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Measure (Measure E) :=
   P.map κ
@@ -50,139 +48,30 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
 
-def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] {G : Type*} (g : G)
-    [Group G] [MulAction G E] [MeasurableConstSMul G E] : Prop :=
-  ∀ g : G, P.map κ = P.map ((DomMulAct.mk.symm g)⁻¹ ⇑κ )
+def is_stationary (G : Type*) [Group G] [MulAction G E] [MeasurableConstSMul G E] : Prop :=
+  ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ
 
-variable {G : Type*} [Group G] [DistribMulAction G E] [MeasurableConstSMul G E]
-variable {μ : Measure E}
---variable {g : Gᵈᵐᵃ}
-variable {κ : Kernel Ω E}
+def shifted_line_grid : ℝ → Measure ℝ := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
 
-theorem asdf : ∀ g : G, (DomMulAct.mk g) • μ = μ := sorry
-theorem ghjk : ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ := sorry
+def k_shifted_line_grid : Kernel ℝ ℝ where
+  toFun := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
+  measurable' := by
+    intro s hs
 
-#check g • μ
 
-theorem MeasureTheory.integral_domSMul{E : Type u_2} [NormedAddCommGroup E] [NormedSpace ℝ E] {G : Type*} {A : Type*} [Group G] [AddCommGroup A] [DistribMulAction G A] [MeasurableSpace A] [MeasurableConstSMul G A] {μ : Measure A} (g : Gᵈᵐᵃ) (f : A → E) :
-    ∫ (x : A), f x ∂g • μ = ∫ (x : A), f ((DomMulAct.mk.symm g)⁻¹ • x) ∂μ := by
-  #check (DomMulAct.mk.symm g)⁻¹
-  #check DomMulAct.mk.symm g
-  sorry
+variable (U : Ω → ℝ) {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P}
 
-instance {G : Type*} [Group G] [MulAction G E] : MulAction G (Measure E) where
-  smul := fun g μ => μ.map (fun x => g • x)
-  one_smul := by
-    intro μ
-    simp only [HSMul.hSMul]
+def unif_shifted_line_grid (X : Ω → ℝ) {h: MeasureTheory.pdf.IsUniform X (Set.Ico 0 1) P}
+    : Kernel Ω ℝ where
+  toFun := shifted_line_grid ∘ U
+  measurable' := by
+    apply Measurable.comp
+    have : Continuous shifted_line_grid := sorry
+    apply Continuous.measurable
+    intro s hs
 
 
 
-    -- example: this is OK
-    have : ∀ x : E, (1 : G) • x = x := by
-      intro x
-      exact MulAction.one_smul x
+theorem unif_shifted_line_grid_is_stationary : is_stationary ℝ  shifted_line_grid
 
-    -- example: don't know where to go from here
-    have : ∀ x : E, SMul.smul (1 : G) x = x := by
-      intro x
-
-
-
-  mul_smul := sorry
-
--- MeasureTheory.Measure.IsMulLeftInvariant
-def IsStationary (κ : Kernel Ω E) (P : Measure Ω) (f : E → E) [IsProbabilityMeasure P] [IsPointProcess κ P]
-  {G : Type*} [Group G] [MulAction G (Measure E)] [MeasurableSpace G]
-    : Prop :=
-  SMulInvariantMeasure G (P.map κ)
-  --∀ g : G, ∀ s : Set E, (P.map κ) s = (P.map κ ) s
-
-
-variable (κ : Kernel Ω E)
-#check κ.toFun
-#check ⇑κ
-#check ↑κ
-#check P.map (κ.toFun)
-#check P.map κ
-#check P.map ⇑κ
-
-def IsGroupInvariant {E : Type*} [MeasurableSpace E] (μ : Measure E) {G : Type*} (g : G)
-    [Group G] [MulAction G (Set E)] : Prop :=
-  ∀ s : Set E, MeasurableSet s → μ s = μ (g • s)
-
-def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] {G : Type*} (g : G)
-    [Group G] [MulAction G (Set E)] : Prop :=
-
-
-def IsStationary (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] [IsPointProcess κ P]
-    : Prop :=
-  sorry
-
---def local_evaluation_map (κ : Kernel Ω E) ()
-
---theorem evaluation_map_is_measurable (κ : Kernel Ω E) (a : Set E) :
-
-def IsStationary {E : Type*} [MeasurableSpace E] [TopologicalSpace E] (h : LocallyFinite E) (κ : Kernel Ω E) : Prop :=
-  𝔼[evaluation_map] = 0
-
-
-/-
-def IsStationary (N : Ω → Measure E) : Prop :=
-  𝔼[evaluation_map] = 0
-
-class PointProcess where
-  rv : Ω → Measure E
-  is_point_measure_as : μ {ω | IsPointMeasure (rv ω)} = 1
-
-def evaluation_map (N : Ω → Measure E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N
-
-def IsPointProcess (N : Ω → Measure E) : Prop := μ {ω | IsPointMeasure (N ω)} = 1
-
-def IsStationary (N : Ω → Measure E) (h : IsPointProcess N) : Prop :=
-  sorry
-
-
-class PointProcess₁ (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ] where
-  rv : Ω → Measure E
-  is_point_measure_as : μ {ω | IsPointMeasure (rv ω)} = 1
-
-def evaluation_map₁ (N : PointProcess Ω E μ) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N.rv
-
-def evaluation_map (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ]
-  (N : PointProcess Ω E μ) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ N.rv
-
-def intensity_measure (Ω E : Type*) [MeasureSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ]
-  (N : PointProcess Ω E μ) (a : Set E) := 𝔼[evaluation_map Ω E μ N a]
-
-def IsStationary (Ω E : Type*) [MeasurableSpace Ω] [MeasurableSpace E] (μ : Measure Ω) [IsProbabilityMeasure μ]
-  (N : PointProcess Ω E μ) (a : Set E) : 𝔼[N.rv a] = 1 Prop :=
-  sorry
-
-variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
-
-variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
-
-set_option diagnostics true
-
-class RandomMeasure {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] where
-  distribution : Ω → Measure E
-  --measurable_space : MeasurableSpace (Measure E)
-  --measurable_distribution : Measurable distribution
-
-class PointProcess₂ {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] extends RandomMeasure where
-  is_point_measure_as : μ {ω : Ω | IsPointMeasure (distribution ω)} = 1
-
-class PointProcess {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
-    (μ : Measure Ω) [IsProbabilityMeasure μ]
-    extends RandomMeasure Ω E where
-  is_point_measure_as : μ {ω : Ω | IsPointMeasure (distribution ω)} = 1
-
-def IsSimplePointProcess {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E]
-    (μ : Measure Ω) [IsProbabilityMeasure μ] (N : PointProcess Ω E μ) : Prop :=
-  ∀ ω : Ω, IsPointMeasure (N.distribution ω)
-
-def IsStationary (N : Type*) [PointProcess N] : Prop :=
-  sorry
--/
 end Probability.RandomMeasures
