@@ -51,6 +51,24 @@ def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => �
 def is_stationary (G : Type*) [Group G] [MulAction G E] [MeasurableConstSMul G E] : Prop :=
   ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ
 
+variable (G : Type*) [AddMonoid G]
+
+noncomputable instance : AddMonoid Gᵈᵐᵃ where
+  add := sorry
+  add_assoc := sorry
+  zero := sorry
+  zero_add := sorry
+  add_zero := sorry
+  nsmul := sorry
+
+noncomputable instance : AddAction Gᵈᵐᵃ (Measure E) where
+  vadd := sorry
+  zero_vadd := sorry
+  add_vadd := sorry
+
+def is_stationary_add (G : Type*) [AddGroup G] [AddAction G E] [MeasurableConstVAdd G E] : Prop :=
+  ∀ g : G, P.map ((DomAddAct.mk g) +ᵥ (⇑κ)) = P.map κ
+
 def shifted_line_grid : ℝ → Measure ℝ := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
 
 def k_shifted_line_grid : Kernel ℝ ℝ where
@@ -70,8 +88,10 @@ def unif_shifted_line_grid (X : Ω → ℝ) {h: MeasureTheory.pdf.IsUniform X (S
     apply Continuous.measurable
     intro s hs
 
+instance amr : AddMonoid ℝ := sorry
 
+#check Multiplicative amr
 
-theorem unif_shifted_line_grid_is_stationary : is_stationary ℝ  shifted_line_grid
+theorem unif_shifted_line_grid_is_stationary : is_stationary (Multiplicative ℝ) shifted_line_grid := sorry
 
 end Probability.RandomMeasures
