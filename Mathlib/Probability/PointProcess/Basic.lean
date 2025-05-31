@@ -18,6 +18,8 @@ import Mathlib.Probability.Notation
 import Mathlib.Probability.Kernel.Defs
 import Mathlib.Probability.Distributions.Uniform
 
+import Mathlib.Data.Real.Basic
+
 /-!
 
 !-/
@@ -39,6 +41,10 @@ variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpa
 variable {P : Measure Ω} [IsProbabilityMeasure P]
 variable {κ : Kernel Ω E}
 
+def my_kernel : Kernel Ω E := sorry
+#check ⇑my_kernel
+
+
 def distribution (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Measure (Measure E) :=
   P.map κ
 
@@ -48,50 +54,31 @@ class IsPointProcess (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P
 
 def evaluation_map (κ : Kernel Ω E) (a : Set E) : Ω → EReal := (fun ν => ν a) ∘ κ
 
-def is_stationary (G : Type*) [Group G] [MulAction G E] [MeasurableConstSMul G E] : Prop :=
+def is_stationary (G : Type*) (κ : Kernel Ω E) (P : Measure Ω)
+    [Group G] [MulAction G E] [MeasurableConstSMul G E]
+    : Prop :=
   ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ
-
-variable (G : Type*) [AddMonoid G]
-
-noncomputable instance : AddMonoid Gᵈᵐᵃ where
-  add := sorry
-  add_assoc := sorry
-  zero := sorry
-  zero_add := sorry
-  add_zero := sorry
-  nsmul := sorry
-
-noncomputable instance : AddAction Gᵈᵐᵃ (Measure E) where
-  vadd := sorry
-  zero_vadd := sorry
-  add_vadd := sorry
-
-def is_stationary_add (G : Type*) [AddGroup G] [AddAction G E] [MeasurableConstVAdd G E] : Prop :=
-  ∀ g : G, P.map ((DomAddAct.mk g) +ᵥ (⇑κ)) = P.map κ
 
 def shifted_line_grid : ℝ → Measure ℝ := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
 
-def k_shifted_line_grid : Kernel ℝ ℝ where
-  toFun := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
-  measurable' := by
-    intro s hs
+instance : AddCommGroup ℝ := by infer_instance
+instance : AddAction ℝ ℝ where
+  zero_vadd := by exact fun p ↦ zero_vadd ℝ p
+  add_vadd := by exact fun g₁ g₂ p ↦ add_vadd g₁ g₂ p
 
+--variable {U : Ω → ℝ} {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P}
 
-variable (U : Ω → ℝ) {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P}
-
-def unif_shifted_line_grid (X : Ω → ℝ) {h: MeasureTheory.pdf.IsUniform X (Set.Ico 0 1) P}
-    : Kernel Ω ℝ where
-  toFun := shifted_line_grid ∘ U
+def randomly_shifted_line_grid (X : Ω → ℝ) : Kernel Ω ℝ where
+  toFun := shifted_line_grid ∘ X
   measurable' := by
     apply Measurable.comp
-    have : Continuous shifted_line_grid := sorry
-    apply Continuous.measurable
-    intro s hs
+    · sorry
+    · exact measurable_generateFrom fun t a ↦ a
 
-instance amr : AddMonoid ℝ := sorry
 
-#check Multiplicative amr
-
-theorem unif_shifted_line_grid_is_stationary : is_stationary (Multiplicative ℝ) shifted_line_grid := sorry
+theorem unif_shifted_line_grid_is_stationary
+  {U : Ω → ℝ} {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P} :
+      is_stationary (Multiplicative ℝ) (randomly_shifted_line_grid U) P := by
+  sorry
 
 end Probability.RandomMeasures
