@@ -41,10 +41,6 @@ variable {Ω E : Type*} [MeasurableSpace Ω] [MeasurableSpace E] [TopologicalSpa
 variable {P : Measure Ω} [IsProbabilityMeasure P]
 variable {κ : Kernel Ω E}
 
-def my_kernel : Kernel Ω E := sorry
-#check ⇑my_kernel
-
-
 def distribution (κ : Kernel Ω E) (P : Measure Ω) [IsProbabilityMeasure P] : Measure (Measure E) :=
   P.map κ
 
@@ -59,7 +55,7 @@ def is_stationary (G : Type*) (κ : Kernel Ω E) (P : Measure Ω)
     : Prop :=
   ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ
 
-def shifted_line_grid : ℝ → Measure ℝ := fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u)
+def shifted_line_grid : ℝ → Measure ℝ := fun x ↦ PointMeasure (fun (n : ℤ) ↦ n + x)
 
 instance : AddCommGroup ℝ := by infer_instance
 instance : AddAction ℝ ℝ where
@@ -68,6 +64,7 @@ instance : AddAction ℝ ℝ where
 
 --variable {U : Ω → ℝ} {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P}
 
+
 def randomly_shifted_line_grid (X : Ω → ℝ) : Kernel Ω ℝ where
   toFun := shifted_line_grid ∘ X
   measurable' := by
@@ -75,10 +72,35 @@ def randomly_shifted_line_grid (X : Ω → ℝ) : Kernel Ω ℝ where
     · sorry
     · exact measurable_generateFrom fun t a ↦ a
 
+theorem asdf (X : Ω → E) (Y : Ω → E) (h : ∀ᵐ ω ∂P, X ω = Y ω) : P.map X = P.map Y := by
+  exact Measure.map_congr h
 
+
+--MeasureTheory.pdf.IsUniform
 theorem unif_shifted_line_grid_is_stationary
-  {U : Ω → ℝ} {h: MeasureTheory.pdf.IsUniform U (Set.Ico 0 1) P} :
+  {U : Ω → ℝ} {h: pdf.IsUniform U (Set.Ico 0 1) P} :
       is_stationary (Multiplicative ℝ) (randomly_shifted_line_grid U) P := by
-  sorry
+  dsimp[is_stationary]
+  intro x
+
+
+
+  simp [randomly_shifted_line_grid]
+
+  let fU : Ω → ℝ := (Set.Ico (0 : ℝ) 1).indicator ((μ s)⁻¹ • 1)
+
+  have : ∀ᵐ ω ∂P, (DomMulAct.mk x • shifted_line_grid ∘ U) ω = (DomMulAct.mk x • shifted_line_grid ∘ U) ω := by
+    sorry
+
+  unfold shifted_line_grid
+  unfold PointMeasure
+
+  simp
+
+
+
+  change fun u ↦ PointMeasure (fun (n : ℤ) ↦ n + u) at shifted_line_grid
+
+
 
 end Probability.RandomMeasures
