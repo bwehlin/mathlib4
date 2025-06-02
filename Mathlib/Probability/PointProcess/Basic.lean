@@ -55,6 +55,24 @@ def is_stationary (G : Type*) (κ : Kernel Ω E) (P : Measure Ω)
     : Prop :=
   ∀ g : G, P.map ((DomMulAct.mk g) • (⇑κ)) = P.map κ
 
+theorem random_vector_conv_iff  :
+
+def empty_measure : Measure E where
+  measureOf := fun _ => 0
+  empty := by simp
+  mono := by simp
+  iUnion_nat := by simp
+  m_iUnion := by
+    intro s h
+    apply?
+
+
+def fidi (P : Measure Ω) := { P.map f  | (f : Ω → (Fin 2 → ℝ))}
+
+def empty_process : Kernel Ω E where
+  toFun := fun ω => (fun (x : Set E) => (0 : ENNReal))
+  measurable' := sorry
+
 def shifted_line_grid : ℝ → Measure ℝ := fun x ↦ PointMeasure (fun (n : ℤ) ↦ n + x)
 
 instance : AddCommGroup ℝ := by infer_instance
@@ -87,10 +105,10 @@ theorem unif_shifted_line_grid_is_stationary
 
   simp [randomly_shifted_line_grid]
 
-  let fU : Ω → ℝ := (Set.Ico (0 : ℝ) 1).indicator ((μ s)⁻¹ • 1)
+  --let fU : Ω → ℝ := (Set.Ico (0 : ℝ) 1).indicator ((μ s)⁻¹ • 1)
 
-  have : ∀ᵐ ω ∂P, (DomMulAct.mk x • shifted_line_grid ∘ U) ω = (DomMulAct.mk x • shifted_line_grid ∘ U) ω := by
-    sorry
+  --have : ∀ᵐ ω ∂P, (DomMulAct.mk x • shifted_line_grid ∘ U) ω = (DomMulAct.mk x • shifted_line_grid ∘ U) ω := by
+  --  sorry
 
   unfold shifted_line_grid
   unfold PointMeasure
