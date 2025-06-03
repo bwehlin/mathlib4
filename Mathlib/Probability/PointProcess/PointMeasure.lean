@@ -24,7 +24,7 @@ open Set
 
 namespace Probability.RandomMeasures
 
-variable {α β δ : Type*} [MeasurableSpace α] [MeasurableSpace β] {s : Set α} {a : α}
+variable {α : Type*} [MeasurableSpace α] {s : Set α} {a : α}
 
 noncomputable def PointMeasure {ι : Type*} (f : ι → α) :
   Measure α := Measure.sum (fun i ↦ Measure.dirac (f i))
@@ -35,29 +35,10 @@ def IsPointMeasure {E : Type*} [MeasurableSpace E] (μ : Measure E) : Prop :=
 def IsSimplePointMeasure {S : Set ℕ} (f : S → α)  : Prop :=
     ∀ x : α, PointMeasure f {x} = 0 ∨ PointMeasure f {x} = 1
 
-@[simp]
-theorem dirac_on_singleton_of_singleton_eq_one {x : α} (hm : MeasurableSet {x}) :
-    Measure.dirac x {x} = (1 : ENNReal) := by
-    rw [Measure.dirac_apply' x hm]
-    exact (indicator_eq_one_iff_mem ENNReal).mpr rfl
-
 theorem dirac_on_singleton_iff {a x : α} (hm : MeasurableSet {x}) :
     Measure.dirac a {x} = (1 : ENNReal) ↔ a = x := by
-    constructor
-    ·   intro h
-        rwa [Measure.dirac_apply' a hm, indicator_eq_one_iff_mem] at h
-    ·   intro h
-        rw[h]
-        apply dirac_on_singleton_of_singleton_eq_one
-        apply hm
-
-theorem point_measure_self_apply_gt {S : Set ℕ} {f : S → α} (hm : ∀ x : α, MeasurableSet {x}) :
-    ∀ (i : S), PointMeasure f {f i} > 0 := by
-  intro i
-  simp[PointMeasure]
-  rw [MeasureTheory.Measure.sum_apply _ (hm (f i)), ENNReal.tsum_eq_add_tsum_ite i,
-    dirac_on_singleton_of_singleton_eq_one (hm (f i))]
-  simp
+    rw [dirac_eq_one_iff_mem hm]
+    exact mem_singleton_iff
 
 theorem is_simple_if_injective {s : Set ℕ} {f : s → α} (hf: Injective f)
     (hm : ∀ x : α, MeasurableSet {x}) :
@@ -110,8 +91,7 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
     intros hsimp i₁ i₂ h
     by_contra hc
 
-    have : dirac (f i₁) {f i₁} = 1 := by exact
-      dirac_on_singleton_of_singleton_eq_one (hm (f i₁))
+    have : dirac (f i₁) {f i₁} = 1 := by exact (dirac_on_singleton_iff (hm (f i₁))).mpr rfl
 
     have ge_two : PointMeasure f {f i₁} ≥ 2 := by
         simp[PointMeasure]
@@ -162,9 +142,8 @@ theorem sum_eq_sum_without_zeros {ι : Type*} [Countable ι] (s t : Set ι) {f :
   simp[this] at ht
   assumption
 
-theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableSingletonClass E]
-    (μ : Measure E) (hlf : IsLocallyFiniteMeasure μ)  :
-    IsPointMeasure μ ↔ ∀ s : Set E, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
+theorem pm_iff_integer_valued {μ : Measure α} :
+    IsPointMeasure μ ↔ ∀ s : Set α, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
 
   constructor
   · intro hpm s hs
@@ -210,7 +189,10 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableS
 
     use ENat.card t
 
-  · sorry
+  · intro h
+    simp[IsPointMeasure, PointMeasure]
+    sorry
+    -- TODO: Prove this (might need more conditions, not sure)
 
 
 
