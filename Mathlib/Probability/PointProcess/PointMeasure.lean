@@ -145,10 +145,28 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
 
+theorem sum_eq_sum_without_zeros {ι : Type*} [Countable ι] (s t : Set ι) {f : ι → ENNReal}
+  (h : ∀ i : ι, i ∈ s ∨ i ∈ t) (ht : ∀ i ∈ t, f i = 0) :
+    ∑' (i : ι), f i = ∑' (i : s), f i + ∑' (i : t), f i := by
+  simp [ht]
+  refine Eq.symm (tsum_subtype_eq_of_support_subset ?_)
+  refine support_subset_iff'.mpr ?_
 
-theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E]
-    (μ : Measure E) (hlf : IsLocallyFiniteMeasure μ) :
-    IsPointMeasure μ ↔ ∀ s : Set E, Measurable s → ∃ n : ℕ∞, μ s = n := by
+  intro i hi
+  have : i ∈ t := by
+    specialize h i
+    simp [hi] at h
+    assumption
+
+  specialize ht i
+  simp[this] at ht
+  assumption
+
+theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableSingletonClass E]
+    (μ : Measure E) (hlf : IsLocallyFiniteMeasure μ)  :
+    IsPointMeasure μ ↔ ∀ s : Set E, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
+  classical
+
   constructor
   intro hpm s hs
   simp [IsPointMeasure] at hpm
@@ -157,9 +175,45 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E]
   rw[μdef]
   let t := { i | f i ∈ s }
 
+  have i_in_t_eq_one : ∀ i : ι, i ∈ t ↔ dirac (f i) s = 1 := by
+    intro i
+    constructor
+    exact fun a ↦ dirac_apply_of_mem a
+    sorry
+
+
+  have i_in_tc_eq_zero : ∀ i : ι, i ∈ tᶜ → dirac (f i) s = 0 := by
+    intro i hi
+    rw [dirac_eq_zero_iff_not_mem hs]
+    exact hi
+
+  have sdecomp1 : ∑' (i : ι), (dirac (f i)) s = ∑' (i : t), (dirac (f i)) s := by
+    rw [sum_eq_sum_without_zeros t tᶜ]
+    simp[i_in_tc_eq_zero]
+    intro i
+    tauto
+    intro i
+    apply i_in_tc_eq_zero
+
+  have sdecomp2 : ∑' (i : t), (dirac (f i)) s = ∑' (i : t), 1 := by
+    refine Eq.symm (tsum_congr ?_)
+    intro i
+    symm
+    rw [dirac_eq_one_iff_mem hs]
+
+    simp[t] at i
+    sorry
 
   have : (sum (fun i ↦ dirac (f i))) s = ENat.card t := by
-    apply?
+    rw[sum_apply, sdecomp1, sdecomp2]
+    exact ENNReal.tsum_one
+
+  use ENat.card t
+
+  · sorry
+
+
+
 
 
 
