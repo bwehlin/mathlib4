@@ -167,48 +167,48 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableS
     IsPointMeasure μ ↔ ∀ s : Set E, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
 
   constructor
-  intro hpm s hs
-  simp [IsPointMeasure] at hpm
-  rcases hpm with ⟨ι, hι, f, μdef⟩
-  simp [PointMeasure] at μdef
-  rw[μdef]
-  let t := { i | f i ∈ s }
+  · intro hpm s hs
+    simp [IsPointMeasure] at hpm
+    rcases hpm with ⟨ι, hι, f, μdef⟩
+    simp [PointMeasure] at μdef
+    rw[μdef]
+    let t := { i | f i ∈ s }
 
-  have i_in_t_eq_one : ∀ i : ι, i ∈ t ↔ dirac (f i) s = 1 := by
-    intro i
-    constructor
-    exact fun a ↦ dirac_apply_of_mem a
-    rw [dirac_eq_one_iff_mem hs]
-    exact fun a ↦ a
+    have i_in_t_eq_one : ∀ i : ι, i ∈ t ↔ dirac (f i) s = 1 := by
+      intro i
+      constructor
+      exact fun a ↦ dirac_apply_of_mem a
+      rw [dirac_eq_one_iff_mem hs]
+      exact fun a ↦ a
 
-  have i_in_tc_eq_zero : ∀ i : ι, i ∈ tᶜ → dirac (f i) s = 0 := by
-    intro i hi
-    rw [dirac_eq_zero_iff_not_mem hs]
-    exact hi
+    have i_in_tc_eq_zero : ∀ i : ι, i ∈ tᶜ → dirac (f i) s = 0 := by
+      intro i hi
+      rw [dirac_eq_zero_iff_not_mem hs]
+      exact hi
 
-  have sdecomp1 : ∑' (i : ι), (dirac (f i)) s = ∑' (i : t), (dirac (f i)) s := by
-    rw [sum_eq_sum_without_zeros t tᶜ]
-    simp[i_in_tc_eq_zero]
-    intro i
-    tauto
-    intro i
-    apply i_in_tc_eq_zero
+    have sdecomp1 : ∑' (i : ι), (dirac (f i)) s = ∑' (i : t), (dirac (f i)) s := by
+      rw [sum_eq_sum_without_zeros t tᶜ]
+      simp[i_in_tc_eq_zero]
+      intro i
+      tauto
+      intro i
+      apply i_in_tc_eq_zero
 
-  have sdecomp2 : ∑' (i : t), (dirac (f i)) s = ∑' (i : t), 1 := by
-    refine Eq.symm (tsum_congr ?_)
-    intro i
-    symm
-    rw [dirac_eq_one_iff_mem hs]
+    have sdecomp2 : ∑' (i : t), (dirac (f i)) s = ∑' (i : t), 1 := by
+      refine Eq.symm (tsum_congr ?_)
+      intro i
+      symm
+      rw [dirac_eq_one_iff_mem hs]
 
-    simp[t] at i
-    obtain ⟨ _, prop ⟩ := i
-    exact prop
+      simp[t] at i
+      obtain ⟨ _, prop ⟩ := i
+      exact prop
 
-  have : (sum (fun i ↦ dirac (f i))) s = ENat.card t := by
-    rw[sum_apply _ hs, sdecomp1, sdecomp2]
-    exact ENNReal.tsum_one
+    have : (sum (fun i ↦ dirac (f i))) s = ENat.card t := by
+      rw[sum_apply _ hs, sdecomp1, sdecomp2]
+      exact ENNReal.tsum_one
 
-  use ENat.card t
+    use ENat.card t
 
   · sorry
 
