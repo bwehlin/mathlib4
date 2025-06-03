@@ -7,6 +7,7 @@ Authors: Björn H. Wehlin
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+import Mathlib.MeasureTheory.Measure.Count
 
 import Mathlib.Algebra.Group.Indicator
 
@@ -143,6 +144,29 @@ theorem is_simple_if_injective_iff {S : Set ℕ} {f : S → α} (hm : ∀ x : α
     · have : PointMeasure f {f i₁} ≠ 1 := by
         apply ne_of_eq_of_ne eq_two (by simp)
       contradiction
+
+
+theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E]
+    (μ : Measure E) (hlf : IsLocallyFiniteMeasure μ) :
+    IsPointMeasure μ ↔ ∀ s : Set E, Measurable s → ∃ n : ℕ∞, μ s = n := by
+  constructor
+  intro hpm s hs
+  simp [IsPointMeasure] at hpm
+  rcases hpm with ⟨ι, hι, f, μdef⟩
+  simp [PointMeasure] at μdef
+  rw[μdef]
+  let t := { i | f i ∈ s }
+
+
+  have : (sum (fun i ↦ dirac (f i))) s = ENat.card t := by
+    apply?
+
+
+
+
+
+
+
 
 theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeasure μ] (a : ℝ) :
     ∃ f : ℤ → EReal,
