@@ -165,7 +165,6 @@ theorem sum_eq_sum_without_zeros {ι : Type*} [Countable ι] (s t : Set ι) {f :
 theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableSingletonClass E]
     (μ : Measure E) (hlf : IsLocallyFiniteMeasure μ)  :
     IsPointMeasure μ ↔ ∀ s : Set E, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
-  classical
 
   constructor
   intro hpm s hs
@@ -179,8 +178,8 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableS
     intro i
     constructor
     exact fun a ↦ dirac_apply_of_mem a
-    sorry
-
+    rw [dirac_eq_one_iff_mem hs]
+    exact fun a ↦ a
 
   have i_in_tc_eq_zero : ∀ i : ι, i ∈ tᶜ → dirac (f i) s = 0 := by
     intro i hi
@@ -202,10 +201,11 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableS
     rw [dirac_eq_one_iff_mem hs]
 
     simp[t] at i
-    sorry
+    obtain ⟨ _, prop ⟩ := i
+    exact prop
 
   have : (sum (fun i ↦ dirac (f i))) s = ENat.card t := by
-    rw[sum_apply, sdecomp1, sdecomp2]
+    rw[sum_apply _ hs, sdecomp1, sdecomp2]
     exact ENNReal.tsum_one
 
   use ENat.card t
@@ -213,29 +213,5 @@ theorem intval {E : Type*} [MeasurableSpace E] [TopologicalSpace E] [MeasurableS
   · sorry
 
 
-
-
-
-
-
-
-
-
-
-theorem time_seq (μ : Measure ℝ) (h : IsPointMeasure μ) [IsLocallyFiniteMeasure μ] (a : ℝ) :
-    ∃ f : ℤ → EReal,
-      f 0 ≤ a ∧ a < f 1
-      ∧ ∀ m n : ℤ, m < n → f m ≤ f n
-      ∧ (∀ s : Set ℝ, Measurable s → μ s =
-        ∑' n : ℤ, if ((f n) = ⊤ ∨ (f n) = ⊥) then 0 else dirac (EReal.toReal (f n)) s) := by
-  obtain ⟨ι, _, f, hf⟩ := h
-  simp[PointMeasure] at hf
-
-  let tlt := { i | f i < a }
-  let tge := { i | f i ≥ a }
-
-
-
-  sorry
 
 end Probability.RandomMeasures
