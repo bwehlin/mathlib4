@@ -142,7 +142,7 @@ theorem sum_eq_sum_without_zeros {ι : Type*} [Countable ι] (s t : Set ι) {f :
   simp[this] at ht
   assumption
 
-theorem pm_iff_integer_valued {μ : Measure α} :
+theorem pm_iff_integer_valued {μ : Measure α} [MeasurableSingletonClass α] [hi: Inhabited α] :
     IsPointMeasure μ ↔ ∀ s : Set α, MeasurableSet s → ∃ n : ℕ∞, μ s = n := by
 
   constructor
@@ -191,6 +191,15 @@ theorem pm_iff_integer_valued {μ : Measure α} :
 
   · intro h
     simp[IsPointMeasure, PointMeasure]
+
+    by_contra hc
+    push_neg at hc
+    specialize hc (Fin 1)
+
+    have hc : ∀ (f : Fin 1 → α), μ ≠ sum fun i ↦ dirac (f i) := by
+      exact fun f ↦ hc instCountableFin f
+
+
     sorry
     -- TODO: Prove this (might need more conditions, not sure)
 
